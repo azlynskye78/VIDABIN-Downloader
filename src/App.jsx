@@ -8,6 +8,7 @@ function App() {
   const [url, setUrl] = useState('');
   const [fetchingFormats, setFetchingFormats] = useState(false);
   const [rawFormatOutput, setRawFormatOutput] = useState('');
+  const [videoTitle, setVideoTitle] = useState('');
   const [deps, setDeps] = useState({ ytdlp: true, ffmpeg: true, checked: false });
 
   // Refs for scrolling
@@ -90,6 +91,10 @@ function App() {
       const data = await res.json();
       if (res.ok) {
         setRawFormatOutput(data.stdout || data.stderr);
+        // Store video title if returned by backend
+        if (data.title) {
+          setVideoTitle(data.title);
+        }
       } else {
         setRawFormatOutput(`ERROR:\n${data.error}\n${data.stderr}`);
       }
@@ -113,7 +118,8 @@ function App() {
         authMode: options.authMode,
         browserName: options.browserName,
         audioFormat: options.audioFormat,
-        itemType: itemType
+        itemType: itemType,
+        videoTitle: videoTitle
       });
 
       const eventSource = new EventSource(`/api/download?${queryParams.toString()}`);

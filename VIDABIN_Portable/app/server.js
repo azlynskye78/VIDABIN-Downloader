@@ -86,7 +86,18 @@ app.post('/api/list-formats', async (req, res) => {
     let cmd = `"${YTDLP_PATH}" ${authArgs.map(a => `"${a}"`).join(' ')} -F "${url}"`;
       
     const { stdout, stderr } = await execAsync(cmd, { env: customEnv });
-    res.json({ stdout, stderr });
+
+    // Also fetch video title
+    let title = '';
+    try {
+      const titleCmd = `"${YTDLP_PATH}" ${authArgs.map(a => `"${a}"`).join(' ')} --print title "${url}"`;
+      const titleResult = await execAsync(titleCmd, { env: customEnv });
+      title = titleResult.stdout.trim();
+    } catch (e) {
+      // Title fetch failed, not critical
+    }
+
+    res.json({ stdout, stderr, title });
   } catch (error) {
     res.status(500).json({ error: error.message, stdout: error.stdout, stderr: error.stderr });
   }
@@ -104,6 +115,7 @@ app.get('/api/download', async (req, res) => {
   const browserName = req.query.browserName || '';
   const audioFormat = req.query.audioFormat || 'm4a';
   const itemType = req.query.itemType || 'mixed';
+  const videoTitle = req.query.videoTitle || '';
 
   if (!url || !formatId) {
     return res.status(400).json({ error: 'URL and formatId are required' });
@@ -132,9 +144,19 @@ app.get('/api/download', async (req, res) => {
     args.push('--merge-output-format', format);
   }
 
+  // Build output directory: outputDir / videoTitle / format
   let finalOutputDir = outputDir;
+  if (videoTitle) {
+    // Sanitize title for filesystem use
+    const safeTitle = videoTitle.replace(/[<>:"/\\|?*]/g, '_').replace(/\s+/g, ' ').trim().substring(0, 200);
+    if (safeTitle) {
+      finalOutputDir = path.join(outputDir, safeTitle);
+    }
+  }
   if (itemType === 'audio' && audioFormat) {
-    finalOutputDir = path.join(outputDir, audioFormat);
+    finalOutputDir = path.join(finalOutputDir, audioFormat);
+  } else if (itemType !== 'audio') {
+    finalOutputDir = path.join(finalOutputDir, format);
   }
 
   if (finalOutputDir) {
