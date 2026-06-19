@@ -1,0 +1,16 @@
+node_modules/
+dist/
+Downloads/
+bin/
+cookies.txt
+*.log
+vite.config.js.timestamp-*.mjs
+VIDABIN_Portable/bin/
+VIDABIN_Portable/Downloads/
+VIDABIN_Portable/cookies.txt
+VIDABIN_Portable/app/node_modules/
+VIDABIN_Portable/app/dist/
+.agents/
+.idea/
+.vscode/
+.DS_Store
