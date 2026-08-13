@@ -1,0 +1,11 @@
+version: 1
+name: vidabin-multitrack-download-mcp
+runtime: typescript
+entry: index.js
+build:
+  install: npm ci
+startCommand:
+  type: http
+  command: node index.js
+configSchema:
+  source: code

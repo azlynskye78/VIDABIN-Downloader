@@ -44,7 +44,12 @@ async function getCookiesPath() {
 }
 
 const buildAuthArgs = async (authMode, browserName) => {
-  const args = ['--extractor-args', 'youtube:player_client=tv,web'];
+  // FIXED (2026-07): YouTube's 'tv' client now uses SABR/DRM-like streaming
+  // which hides multitrack dubbed audio. Using 'default,web_embedded' instead
+  // restores full audio track discovery including all language dubs.
+  const args = [
+    '--extractor-args', 'youtube:player_client=default,web_embedded'
+  ];
   
   if (authMode === 'browser' && browserName) {
     args.push('--cookies-from-browser', browserName);

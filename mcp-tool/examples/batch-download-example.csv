@@ -1,0 +1,7 @@
+url,cookies_file,download_type,languages,audio_format,video_quality,video_format,subtitles,note
+https://www.youtube.com/watch?v=EXAMPLE_VIDEO_1,D:\cookies\client_karim.txt,audio_only,"bn,hi",mp3,,,none,ভিডিও ১ — বাংলা ও হিন্দি অডিও
+https://www.youtube.com/watch?v=EXAMPLE_VIDEO_2,D:\cookies\client_rahim.txt,audio_only,all,mp3,,,none,ভিডিও ২ — সব ভাষার অডিও
+https://www.youtube.com/watch?v=EXAMPLE_VIDEO_3,,video_with_audio,en,mp3,1080p,mkv,all,ভিডিও ৩ — ভিডিও + ইংরেজি অডিও + subtitle
+https://www.youtube.com/watch?v=EXAMPLE_VIDEO_4,,video_only,,, 2160p,mp4,none,ভিডিও ৪ — শুধু 4K ভিডিও
+https://www.youtube.com/watch?v=EXAMPLE_VIDEO_5,D:\cookies\client_jamal.txt,video_with_all_audio,all,mp3,1080p,mkv,none,ভিডিও ৫ — সব অডিও merge
+https://www.youtube.com/watch?v=EXAMPLE_VIDEO_6,D:\cookies\client_hasan.txt,audio_only,"en,bn,hi,ar,ja",wav,,,none,ভিডিও ৬ — ৫টি ভাষার অডিও WAV

@@ -30,7 +30,7 @@ function App() {
     audioMultistreams: false,
     authMode: 'default',
     browserName: 'chrome',
-    audioFormat: 'm4a'
+    audioFormat: 'mp3'
   });
 
   // Download State
@@ -105,7 +105,7 @@ function App() {
     }
   };
 
-  // Download single format via SSE
+  // Download single format via SSE — rejects on error for retry logic
   const downloadSingle = (formatId, itemType = 'mixed') => {
     return new Promise((resolve, reject) => {
       const queryParams = new URLSearchParams({
@@ -147,13 +147,34 @@ function App() {
       });
 
       eventSource.addEventListener('error', (e) => {
-        if (e.data) {
-          setLogs(prev => [...prev, `✗ Error: ${JSON.parse(e.data)}`]);
-        }
+        const errMsg = e.data ? JSON.parse(e.data) : 'Connection error';
+        setLogs(prev => [...prev, `✗ Error: ${errMsg}`]);
         eventSource.close();
-        resolve(); // Don't reject, continue with next in bulk
+        reject(new Error(errMsg));
       });
     });
+  };
+
+  // Retry wrapper — attempts up to MAX_RETRIES before giving up
+  const MAX_RETRIES = 3;
+  const downloadWithRetry = async (formatId, itemType = 'mixed') => {
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        await downloadSingle(formatId, itemType);
+        return true; // success
+      } catch (err) {
+        if (attempt < MAX_RETRIES) {
+          const waitSec = attempt * 3; // 3s, 6s, 9s
+          setLogs(prev => [...prev, `\n⚠️ Attempt ${attempt}/${MAX_RETRIES} failed for ${formatId}. Retrying in ${waitSec}s...`]);
+          await new Promise(r => setTimeout(r, waitSec * 1000));
+          setProgress(0);
+        } else {
+          setLogs(prev => [...prev, `\n❌ All ${MAX_RETRIES} attempts failed for ${formatId}. Skipping...`]);
+          return false; // all retries exhausted
+        }
+      }
+    }
+    return false;
   };
 
   // Determine if we're in audio bulk mode
@@ -172,6 +193,9 @@ function App() {
     setProgress(0);
     setStatusMsg('');
 
+    let successCount = 0;
+    let failCount = 0;
+
     // === CASE 1: Audio Bulk Mode (multi audios, merging OFF) ===
     if (isAudioBulkMode && selectedVideos.length === 0) {
       const total = selectedAudios.length;
@@ -184,7 +208,8 @@ function App() {
         setProgress(0);
         setLogs(prev => [...prev, `\n🎧 [${i + 1}/${total}] Downloading audio track: ${aud}...`]);
 
-        await downloadSingle(aud, 'audio');
+        const ok = await downloadWithRetry(aud, 'audio');
+        if (ok) successCount++; else failCount++;
 
         if (i < total - 1) {
           await new Promise(r => setTimeout(r, 1500));
@@ -192,7 +217,10 @@ function App() {
       }
 
       setBulkProgress({ current: total, total, currentId: '' });
-      setStatusMsg(`Bulk audio download complete! ${total} tracks downloaded. ✓`);
+      const summary = failCount > 0
+        ? `Bulk audio download finished: ${successCount}/${total} succeeded, ${failCount} failed after retries.`
+        : `Bulk audio download complete! All ${total} tracks downloaded. ✓`;
+      setStatusMsg(summary);
       setProgress(100);
       setIsDownloading(false);
       return;
@@ -200,7 +228,6 @@ function App() {
 
     // === CASE 2: Video Bulk Mode (multi videos) ===
     if (selectedVideos.length > 1) {
-      // If also audio bulk mode, download videos first, then audios
       const allItems = [];
       selectedVideos.forEach(v => allItems.push({ id: v, type: 'video' }));
       if (isAudioBulkMode) {
@@ -218,7 +245,8 @@ function App() {
         setProgress(0);
         setLogs(prev => [...prev, `\n${icon} [${i + 1}/${total}] Downloading ${item.type}: ${item.id}...`]);
 
-        await downloadSingle(item.id, item.type);
+        const ok = await downloadWithRetry(item.id, item.type);
+        if (ok) successCount++; else failCount++;
 
         if (i < total - 1) {
           await new Promise(r => setTimeout(r, 1500));
@@ -226,13 +254,16 @@ function App() {
       }
 
       setBulkProgress({ current: total, total, currentId: '' });
-      setStatusMsg(`Bulk download complete! ${total} items downloaded. ✓`);
+      const summary = failCount > 0
+        ? `Bulk download finished: ${successCount}/${total} succeeded, ${failCount} failed after retries.`
+        : `Bulk download complete! All ${total} items downloaded. ✓`;
+      setStatusMsg(summary);
       setProgress(100);
       setIsDownloading(false);
       return;
     }
 
-    // === CASE 3: Single/Merge mode (1 video + audios merged, or single selection) ===
+    // === CASE 3: Single/Merge mode ===
     const formatString = (selectedVideos.length === 1 && selectedAudios.length > 0)
       ? `${selectedVideos[0]}+${selectedAudios.join('+')}`
       : (selectedVideos[0] || selectedAudios.join('+'));
@@ -241,8 +272,8 @@ function App() {
     if (selectedVideos.length === 0 && selectedAudios.length > 0) singleItemType = 'audio';
     else if (selectedVideos.length > 0 && selectedAudios.length === 0) singleItemType = 'video';
 
-    await downloadSingle(formatString, singleItemType);
-    setStatusMsg('Download completed! ✓');
+    const ok = await downloadWithRetry(formatString, singleItemType);
+    setStatusMsg(ok ? 'Download completed! ✓' : 'Download failed after 3 attempts. ✗');
     setProgress(100);
     setIsDownloading(false);
   };
@@ -571,9 +602,9 @@ function App() {
                         onChange={(e) => setOptions({ ...options, audioFormat: e.target.value })}
                         className="w-full bg-[#0b0c10] border border-gray-800 text-white rounded-xl py-3 px-4 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all appearance-none"
                       >
-                        <option value="m4a">M4A (Default/Original)</option>
-                        <option value="mp3">MP3</option>
+                        <option value="mp3">MP3 (Default)</option>
                         <option value="wav">WAV</option>
+                        <option value="m4a">M4A (Original)</option>
                         <option value="flac">FLAC</option>
                         <option value="aac">AAC</option>
                       </select>

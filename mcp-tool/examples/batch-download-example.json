@@ -1,0 +1,69 @@
+{
+  "_comment": "VIDABIN MCP Batch Download — নমুনা প্রম্পট ফাইল (JSON)",
+  "_instructions": "এই ফাইলটি AI Agent-কে দিন। AI এটি পড়ে স্বয়ংক্রিয়ভাবে সব ডাউনলোড করবে।",
+  "_version": "1.0",
+
+  "global_settings": {
+    "output_dir": "D:\\Downloads\\VIDABIN",
+    "audio_format": "mp3",
+    "video_format": "mkv",
+    "subtitles": "none",
+    "max_retries": 3,
+    "delay_between_downloads_sec": 5,
+    "default_cookies_file": "D:\\cookies\\main_account.txt"
+  },
+
+  "videos": [
+    {
+      "_note": "ভিডিও ১ — শুধু বাংলা ও হিন্দি অডিও ট্র্যাক MP3 তে ডাউনলোড",
+      "url": "https://www.youtube.com/watch?v=EXAMPLE_VIDEO_1",
+      "cookies_file": "D:\\cookies\\client_karim.txt",
+      "download_type": "audio_only",
+      "languages": ["bn", "hi"],
+      "audio_format": "mp3"
+    },
+    {
+      "_note": "ভিডিও ২ — সব ভাষার অডিও ট্র্যাক MP3 তে ডাউনলোড",
+      "url": "https://www.youtube.com/watch?v=EXAMPLE_VIDEO_2",
+      "cookies_file": "D:\\cookies\\client_rahim.txt",
+      "download_type": "audio_only",
+      "languages": ["all"],
+      "audio_format": "mp3"
+    },
+    {
+      "_note": "ভিডিও ৩ — 1080p ভিডিও + ইংরেজি অডিও + সব subtitle",
+      "url": "https://www.youtube.com/watch?v=EXAMPLE_VIDEO_3",
+      "cookies_file": null,
+      "download_type": "video_with_audio",
+      "languages": ["en"],
+      "video_quality": "1080p",
+      "video_format": "mkv",
+      "subtitles": "all"
+    },
+    {
+      "_note": "ভিডিও ৪ — শুধু ভিডিও (অডিও ছাড়া) 4K",
+      "url": "https://www.youtube.com/watch?v=EXAMPLE_VIDEO_4",
+      "download_type": "video_only",
+      "video_quality": "2160p",
+      "video_format": "mp4"
+    },
+    {
+      "_note": "ভিডিও ৫ — ভিডিওর সাথে সব ভাষার অডিও ট্র্যাক merge করে MKV",
+      "url": "https://www.youtube.com/watch?v=EXAMPLE_VIDEO_5",
+      "cookies_file": "D:\\cookies\\client_jamal.txt",
+      "download_type": "video_with_all_audio",
+      "languages": ["all"],
+      "video_quality": "1080p",
+      "video_format": "mkv",
+      "audio_multistreams": true
+    },
+    {
+      "_note": "ভিডিও ৬ — নির্দিষ্ট কিছু ভাষার অডিও WAV ফরম্যাটে",
+      "url": "https://www.youtube.com/watch?v=EXAMPLE_VIDEO_6",
+      "cookies_file": "D:\\cookies\\client_hasan.txt",
+      "download_type": "audio_only",
+      "languages": ["en", "bn", "hi", "ar", "ja"],
+      "audio_format": "wav"
+    }
+  ]
+}

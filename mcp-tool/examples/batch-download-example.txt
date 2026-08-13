@@ -1,0 +1,86 @@
+Gmail : mohammadratin00@gmail.com
+
+🔑 আপনার Private এন্ডপয়েন্ট (শুধু আপনার জন্য):
+Gateway URL: https://vidabin-multitrack-download-mcp.mcpize.run
+
+এই URL-টি শুধু আপনি জানেন। যেকোনো AI ক্লায়েন্টে এভাবে ব্যবহার করুন:
+
+{
+  "mcpServers": {
+    "vidabin-multitrack-download-mcp": {
+      "url": "https://vidabin-multitrack-download-mcp.mcpize.run/mcp"
+    }
+  }
+}
+
+অথবা লোকাল (সবচেয়ে নিরাপদ):
+
+{
+  "mcpServers": {
+    "vidabin-multitrack-download-mcp": {
+      "command": "node",
+      "args": ["D:\\MyAI\\Content create\\Multitrack Audio download\\mcp-server\\index.js"]
+    }
+  }
+}
+
+
+# ============================================
+# VIDABIN MCP Batch Download — নমুনা প্রম্পট ফাইল (Text)
+# এই ফাইলটি AI Agent-কে দিন বা এর content paste করুন।
+# AI এটি পড়ে স্বয়ংক্রিয়ভাবে সব ডাউনলোড করবে।
+# ============================================
+
+# --- Global Settings ---
+OUTPUT_DIR: D:\Downloads\VIDABIN
+AUDIO_FORMAT: mp3
+VIDEO_FORMAT: mkv
+DEFAULT_COOKIES: D:\cookies\main_account.txt
+MAX_RETRIES: 3
+DELAY_SECONDS: 5
+
+# ============================================
+
+# ভিডিও ১ — শুধু বাংলা ও হিন্দি অডিও ট্র্যাক
+URL: https://www.youtube.com/watch?v=EXAMPLE_VIDEO_1
+COOKIE: D:\cookies\client_karim.txt
+TYPE: audio_only
+LANGUAGE: bn, hi
+FORMAT: mp3
+
+# ভিডিও ২ — সব ভাষার অডিও ট্র্যাক
+URL: https://www.youtube.com/watch?v=EXAMPLE_VIDEO_2
+COOKIE: D:\cookies\client_rahim.txt
+TYPE: audio_only
+LANGUAGE: all
+FORMAT: mp3
+
+# ভিডিও ৩ — 1080p ভিডিও + ইংরেজি অডিও + সব subtitle
+URL: https://www.youtube.com/watch?v=EXAMPLE_VIDEO_3
+TYPE: video_with_audio
+LANGUAGE: en
+QUALITY: 1080p
+VIDEO_FORMAT: mkv
+SUBTITLES: all
+
+# ভিডিও ৪ — শুধু 4K ভিডিও (অডিও ছাড়া)
+URL: https://www.youtube.com/watch?v=EXAMPLE_VIDEO_4
+TYPE: video_only
+QUALITY: 2160p
+VIDEO_FORMAT: mp4
+
+# ভিডিও ৫ — সব অডিও ট্র্যাক ভিডিওর সাথে merge
+URL: https://www.youtube.com/watch?v=EXAMPLE_VIDEO_5
+COOKIE: D:\cookies\client_jamal.txt
+TYPE: video_with_all_audio
+LANGUAGE: all
+QUALITY: 1080p
+VIDEO_FORMAT: mkv
+AUDIO_MULTISTREAMS: true
+
+# ভিডিও ৬ — নির্দিষ্ট ভাষার অডিও WAV ফরম্যাটে
+URL: https://www.youtube.com/watch?v=EXAMPLE_VIDEO_6
+COOKIE: D:\cookies\client_hasan.txt
+TYPE: audio_only
+LANGUAGE: en, bn, hi, ar, ja
+FORMAT: wav
